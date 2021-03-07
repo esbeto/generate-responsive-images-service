@@ -5,26 +5,40 @@ const config = {
     },
     {
       size: "medium",
+      ext: "webp",
+    },
+    {
+      size: "medium",
       scale: 2,
     },
     {
       size: "medium",
       ext: "webp",
+      scale: 2,
     },
     {
-      size: "medium",
+      size: "small",
+    },
+    {
+      size: "small",
+      ext: "webp",
+    },
+    {
+      size: "small",
+      scale: 2,
+    },
+    {
+      size: "small",
       ext: "webp",
       scale: 2,
     },
     {
       size: "small",
+      scale: 3,
     },
     {
       size: "small",
-      scale: 2,
-    },
-    {
-      size: "small",
+      ext: "webp",
       scale: 3,
     },
   ],
