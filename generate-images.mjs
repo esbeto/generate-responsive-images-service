@@ -36,55 +36,46 @@ async function resizeImage(buffer, options) {
   });
 }
 
-export default function generateImages(buffer, options) {
-  return new Promise((fulfill, reject) => {
-    const opts = Object.assign(defaultConfig, options || {});
-    const name = opts.name;
+export default async function generateImages(buffer, options) {
+  const opts = Object.assign(defaultConfig, options || {});
+  const name = opts.name;
 
-    let dist, relativePath;
-    if (opts.dist) {
-      relativePath = opts.relativePath || `${name}`;
-      dist = opts.dist;
-    } else {
-      relativePath = opts.relativePath || `${name}`;
-      dist = resolve(process.cwd(), "/");
+  let dist, relativePath;
+  if (opts.dist) {
+    relativePath = opts.relativePath || `${name}`;
+    dist = opts.dist;
+  } else {
+    relativePath = opts.relativePath || `${name}`;
+    dist = resolve(process.cwd(), "/");
+  }
+
+  if (opts.medium) {
+    opts.imageSize.medium = parseInt(opts.medium, 10) || opts.imageSize.medium;
+  }
+
+  if (opts.small) {
+    opts.imageSize.small = parseInt(opts.small, 10) || opts.imageSize.small;
+  }
+
+  return mkdirp(`${dist}/${relativePath}`).then((made) => {
+    if (!made) {
+      throw new Error("Couldn't create directory");
     }
 
-    if (opts.medium) {
-      opts.imageSize.medium =
-        parseInt(opts.medium, 10) || opts.imageSize.medium;
+    const promises = [];
+    const conditions = opts.preset;
+    for (const cond of conditions) {
+      cond.name = name;
+      cond.ext = cond.ext || opts.ext;
+      cond.scale = parseInt(cond.scale, 10) || 1;
+      cond.dist = dist;
+      cond.relativePath = relativePath;
+      cond.imageSize = opts.imageSize;
+      promises.push(resizeImage(buffer, cond));
     }
 
-    if (opts.small) {
-      opts.imageSize.small = parseInt(opts.small, 10) || opts.imageSize.small;
-    }
-
-    mkdirp(`${dist}/${relativePath}`).then((made) => {
-      if (!made) {
-        reject();
-        return;
-      }
-
-      const promises = [];
-      const conditions = opts.preset;
-      for (const cond of conditions) {
-        cond.name = name;
-        cond.ext = cond.ext || opts.ext;
-        cond.scale = parseInt(cond.scale, 10) || 1;
-        cond.dist = dist;
-        cond.relativePath = relativePath;
-        cond.imageSize = opts.imageSize;
-        promises.push(resizeImage(buffer, cond));
-      }
-
-      Promise.all(promises)
-        .then((results) => {
-          const relativePaths = results.map((result) => result.relativePath);
-          fulfill(relativePaths);
-        })
-        .catch((err) => {
-          reject(err);
-        });
+    return Promise.all(promises).then((results) => {
+      return results.map((result) => result.relativePath);
     });
   });
 }

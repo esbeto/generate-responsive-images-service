@@ -5,22 +5,19 @@ import { readFile, readdirSync } from "fs";
 import generateImages from "../generate-images.mjs";
 
 function readFileAndGenerate(filePath, dist, small, medium) {
-  return new Promise((fulfill, reject) => {
+  return new Promise((resolve, reject) => {
     readFile(filePath, (err, buffer) => {
+      if (err) reject(err);
       const imagePath = parse(filePath);
-      generateImages(buffer, {
-        dist: dist,
-        name: imagePath.name,
-        ext: imagePath.ext.replace(/^\./, ""),
-        small: small,
-        medium: medium,
-      })
-        .then((filePaths) => {
-          fulfill(filePaths);
+      resolve(
+        generateImages(buffer, {
+          dist: dist,
+          name: imagePath.name,
+          ext: imagePath.ext.replace(/^\./, ""),
+          small: small,
+          medium: medium,
         })
-        .catch((err) => {
-          reject(err);
-        });
+      );
     });
   });
 }
