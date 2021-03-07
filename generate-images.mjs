@@ -1,8 +1,8 @@
-//@ts-check
 import { resolve } from "path";
 import sharp from "sharp";
 import mkdirp from "mkdirp";
-import defaultConfig from "./default-config.json";
+
+import defaultConfig from "./default-config.mjs";
 
 async function resizeImage(buffer, options) {
   const { size, name, ext, scale, dist, relativePath } = options;
